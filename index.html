@@ -1,950 +1,1919 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toback Microhedging Business Model</title>
+    <title>Toback Microhedging Platform</title>
     
-    <!-- Load required libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Use Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <!-- Custom Styles -->
     <style>
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-            margin: 20px 0;
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --dark-blue: #0f172a;
+            --card-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+            --hover-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            --sidebar-width: 280px;
         }
         
-        .slider {
-            width: 100%;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        .metric-card {
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            background-color: white;
-            margin-bottom: 16px;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: var(--gray-800);
+            line-height: 1.5;
+            overflow-x: hidden;
         }
         
-        .positive {
-            color: #10B981;
-        }
-        
-        .negative {
-            color: #EF4444;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .year-selector {
+        .app-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 16px;
+            min-height: 100vh;
         }
-
-        .year-btn {
-            padding: 8px 12px;
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--gray-900);
+            color: white;
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 10px rgba(15, 23, 42, 0.1);
+            z-index: 10;
+        }
+        
+        .sidebar-header {
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidebar-logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
             border-radius: 8px;
-            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .sidebar-logo span {
+            font-weight: 300;
+        }
+        
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            margin: 1.5rem 0 0.75rem;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .period-selector {
+            margin-bottom: 1rem;
+        }
+        
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: var(--gray-400);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
             cursor: pointer;
             transition: all 0.2s;
-            background-color: #f3f4f6;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 0.25rem;
         }
-
-        .year-btn.active {
-            background-color: #3B82F6;
+        
+        .period-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
             color: white;
         }
-
-        .time-period {
-            font-size: 16px;
+        
+        .period-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .strategy-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .strategy-title {
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #3B82F6;
-            margin-top: 8px;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+        
+        .strategy-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .strategy-option label {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-300);
+            cursor: pointer;
+        }
+        
+        .strategy-option input {
+            cursor: pointer;
+        }
+        
+        .param-slider {
+            margin-bottom: 1.25rem;
+        }
+        
+        .param-slider label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-300);
+        }
+        
+        .param-slider-value {
+            font-weight: 600;
+            color: white;
+        }
+        
+        .param-slider input {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 4px;
+            background: var(--gray-700);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .param-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .param-slider input::-webkit-slider-thumb:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+        
+        .param-slider input::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .param-slider input::-moz-range-thumb:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+        
+        .additional-revenue {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .additional-revenue .sidebar-title {
+            color: var(--secondary);
+            margin-top: 0;
+        }
+        
+        .sidebar-footer {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+        
+        .period-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .period-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .col-span-3 {
+            grid-column: span 3;
+        }
+        
+        .col-span-4 {
+            grid-column: span 4;
+        }
+        
+        .col-span-6 {
+            grid-column: span 6;
+        }
+        
+        .col-span-8 {
+            grid-column: span 8;
+        }
+        
+        .col-span-12 {
+            grid-column: span 12;
+        }
+        
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+        }
+        
+        .stat-positive {
+            color: var(--secondary);
+        }
+        
+        .stat-negative {
+            color: var(--danger);
+        }
+        
+        /* Strategy & Savings Cards */
+        .strategy-card, .savings-card {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .strategy-details {
+            margin-bottom: 1rem;
+        }
+        
+        .strategy-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+        
+        .strategy-item-label {
+            color: var(--gray-500);
+        }
+        
+        .strategy-item-value {
+            font-weight: 500;
+        }
+        
+        .strategy-item-value.positive {
+            color: var(--secondary);
+        }
+        
+        .strategy-item-value.negative {
+            color: var(--danger);
+        }
+        
+        /* Profit & Savings Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        
+        .summary-item {
+            padding: 1.25rem;
+            border-radius: 10px;
+        }
+        
+        .summary-business {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .summary-client {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .summary-commission {
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .summary-ecosystem {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .summary-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-business .summary-title {
+            color: var(--primary);
+        }
+        
+        .summary-client .summary-title {
+            color: var(--secondary);
+        }
+        
+        .summary-commission .summary-title {
+            color: var(--warning);
+        }
+        
+        .summary-ecosystem .summary-title {
+            color: #8B5CF6;
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-business .summary-value {
+            color: var(--primary);
+        }
+        
+        .summary-client .summary-value {
+            color: var(--secondary);
+        }
+        
+        .summary-commission .summary-value {
+            color: var(--warning);
+        }
+        
+        .summary-ecosystem .summary-value {
+            color: #8B5CF6;
+        }
+        
+        .summary-desc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .chart-description {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+        
+        .chart-description strong {
+            color: var(--gray-900);
         }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-6">
-        <header class="mb-8 bg-white p-6 rounded-lg shadow-sm">
-            <h1 class="text-3xl font-bold text-blue-600">Toback Microhedging Business Model</h1>
-            <p class="text-gray-600 mt-2">
-                Business simulation dashboard with historical data (2019-2024)
-            </p>
-            <p class="time-period mt-2" id="current-period">Current period: All Years (2019-2024)</p>
-        </header>
-        
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow lg:col-span-1">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Business Parameters</h2>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="logo-icon">T</div>
+                    Toback <span>Microhedging</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Simulation Period</div>
+                <div class="period-selector" id="period-selector">
+                    <button data-year="all" class="period-btn active">All Years (2019-2024)</button>
+                    <button data-year="2019" class="period-btn">2019</button>
+                    <button data-year="2020" class="period-btn">2020</button>
+                    <button data-year="2021" class="period-btn">2021</button>
+                    <button data-year="2022" class="period-btn">2022</button>
+                    <button data-year="2023" class="period-btn">2023</button>
+                    <button data-year="2024" class="period-btn">2024</button>
+                    <button data-year="2023-2024" class="period-btn">2023-2024</button>
+                </div>
+            </div>
+            
+            <div class="strategy-selector">
+                <div class="strategy-title">Hedging Strategy</div>
+                <div class="strategy-option">
+                    <input type="radio" id="normal-scenario" name="scenario" checked>
+                    <label for="normal-scenario">Base Protection</label>
+                </div>
+                <div class="strategy-option">
+                    <input type="radio" id="extreme-scenario" name="scenario">
+                    <label for="extreme-scenario">Advanced Protection</label>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">
+                    Analysis based on actual historical data with different protection levels
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Business Parameters</div>
                 
-                <!-- Selettore di anno -->
-                <div class="mb-6">
-                    <label>Simulation Period:</label>
-                    <div class="year-selector" id="year-selector">
-                        <button data-year="all" class="year-btn active">All Years</button>
-                        <button data-year="2019" class="year-btn">2019</button>
-                        <button data-year="2020" class="year-btn">2020</button>
-                        <button data-year="2021" class="year-btn">2021</button>
-                        <button data-year="2022" class="year-btn">2022</button>
-                        <button data-year="2023" class="year-btn">2023</button>
-                        <button data-year="2024" class="year-btn">2024</button>
-                        <button data-year="2023-2024" class="year-btn">2023-2024</button>
-                    </div>
+                <div class="param-slider">
+                    <label>
+                        <span>Number of SMEs</span>
+                        <span class="param-slider-value" id="numSMEs-value">50</span>
+                    </label>
+                    <input
+                        type="range"
+                        min="10"
+                        max="10000"
+                        step="10"
+                        value="50"
+                        id="numSMEs"
+                    />
                 </div>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label>Number of SMEs: <span id="numSMEs-value">100</span></label>
+                <div class="param-slider">
+                    <label>
+                        <span>Avg. Consumption (kWh)</span>
+                        <span class="param-slider-value" id="avgConsumption-value">100,000</span>
+                    </label>
+                    <input
+                        type="range"
+                        min="50000"
+                        max="500000"
+                        step="10000"
+                        value="100000"
+                        id="avgConsumption"
+                    />
+                </div>
+                
+                <div class="param-slider">
+                    <label>
+                        <span>Premium Percentage</span>
+                        <span class="param-slider-value" id="premiumPercentage-value">1.0%</span>
+                    </label>
+                    <input
+                        type="range"
+                        min="0.5"
+                        max="5"
+                        step="0.1"
+                        value="1.0"
+                        id="premiumPercentage"
+                    />
+                </div>
+                
+                <div class="param-slider">
+                    <label>
+                        <span>Hedging Coverage</span>
+                        <span class="param-slider-value" id="hedgingPercentage-value">95%</span>
+                    </label>
+                    <input
+                        type="range"
+                        min="25"
+                        max="100"
+                        step="5"
+                        value="95"
+                        id="hedgingPercentage"
+                    />
+                </div>
+                
+                <div class="param-slider">
+                    <label>
+                        <span>Annual Carry Cost</span>
+                        <span class="param-slider-value" id="annualCarryCost-value">5.0%</span>
+                    </label>
+                    <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        step="0.5"
+                        value="5.0"
+                        id="annualCarryCost"
+                    />
+                </div>
+                
+                <div class="additional-revenue">
+                    <div class="sidebar-title">Additional Revenue</div>
+                    <div class="param-slider">
+                        <label>
+                            <span>Savings Commission</span>
+                            <span class="param-slider-value" id="savingsCommissionPercent-value">5.0%</span>
+                        </label>
                         <input
                             type="range"
-                            class="slider"
-                            min="10"
-                            max="500"
-                            step="10"
-                            value="100"
-                            id="numSMEs"
-                        />
-                    </div>
-                    
-                    <div>
-                        <label>Average Consumption (kWh): <span id="avgConsumption-value">150,000</span></label>
-                        <input
-                            type="range"
-                            class="slider"
-                            min="50000"
-                            max="500000"
-                            step="10000"
-                            value="150000"
-                            id="avgConsumption"
-                        />
-                    </div>
-                    
-                    <div>
-                        <label>Premium Percentage: <span id="premiumPercentage-value">2.0</span>%</label>
-                        <input
-                            type="range"
-                            class="slider"
-                            min="0.5"
-                            max="5"
-                            step="0.1"
-                            value="2"
-                            id="premiumPercentage"
-                        />
-                    </div>
-                    
-                    <div>
-                        <label>Hedging Coverage: <span id="hedgingPercentage-value">75</span>%</label>
-                        <input
-                            type="range"
-                            class="slider"
-                            min="25"
-                            max="100"
-                            step="5"
-                            value="75"
-                            id="hedgingPercentage"
-                        />
-                    </div>
-                    
-                    <div>
-                        <label>Annual Carry Cost: <span id="annualCarryCost-value">5.0</span>%</label>
-                        <input
-                            type="range"
-                            class="slider"
-                            min="1"
-                            max="10"
+                            min="0"
+                            max="30"
                             step="0.5"
-                            value="5"
-                            id="annualCarryCost"
+                            value="5.0"
+                            id="savingsCommissionPercent"
                         />
                     </div>
+                    <div style="font-size: 0.75rem; color: var(--gray-300);">
+                        Commission percentage on actual savings generated for SMEs
+                    </div>
                 </div>
             </div>
             
-            <div class="bg-white p-6 rounded-lg shadow lg:col-span-3">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Business Performance</h2>
-                
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                    <div class="metric-card">
-                        <h3 class="text-sm font-medium text-gray-500">Total Revenue</h3>
-                        <p class="text-2xl font-bold" id="total-revenue">€0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">Total revenue for the period</p>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3 class="text-sm font-medium text-gray-500">Monthly Premium</h3>
-                        <p class="text-2xl font-bold" id="monthly-premium">€0.00</p>
-                        <p class="text-xs text-gray-500 mt-1">Average monthly premium</p>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3 class="text-sm font-medium text-gray-500">Profit Margin</h3>
-                        <p class="text-2xl font-bold" id="profit-margin">0.00%</p>
-                        <p class="text-xs text-gray-500 mt-1">Overall profit margin</p>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div class="metric-card">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">Hedging Strategy</h3>
-                        <p class="text-sm text-gray-600">Gas swap combined with long straddle (call + put options)</p>
-                        <div class="mt-2 text-sm grid grid-cols-3 gap-2">
-                            <div>Options Cost: <span id="options-cost">€0.00</span> per MWh</div>
-                            <div>Initial Investment: <span id="initial-investment">€0.00</span></div>
-                            <div>Hedging P&L: <span id="hedging-pnl">€0.00</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <h3 class="text-sm font-medium text-gray-700 mb-2">Savings Generated for SMEs</h3>
-                        <div class="mt-2 text-sm grid grid-cols-2 gap-2">
-                            <div>Total Savings: <span id="total-savings" class="text-lg font-semibold positive">€0.00</span></div>
-                            <div>Average Savings per SME: <span id="avg-savings-per-sme" class="text-lg font-semibold positive">€0.00</span></div>
-                            <div>Average Monthly Savings: <span id="monthly-savings" class="font-semibold">€0.00</span></div>
-                            <div>Average Savings %: <span id="percent-savings" class="font-semibold">0.00%</span></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="metric-card">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Profit & Savings - Summary</h3>
-                    <div class="mt-2 text-sm grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="border rounded-lg p-3 bg-blue-50">
-                            <h4 class="font-bold text-blue-800">Business Profit</h4>
-                            <p class="text-2xl font-bold" id="total-profit">€0.00</p>
-                            <p class="text-xs text-gray-600 mt-1">Net profit after hedging costs</p>
-                        </div>
-                        <div class="border rounded-lg p-3 bg-green-50">
-                            <h4 class="font-bold text-green-800">SMEs Value Generated</h4>
-                            <p class="text-2xl font-bold positive" id="total-client-value">€0.00</p>
-                            <p class="text-xs text-gray-600 mt-1">Total savings for all clients</p>
-                        </div>
-                        <div class="border rounded-lg p-3 bg-purple-50">
-                            <h4 class="font-bold text-purple-800">Total Value Generated</h4>
-                            <p class="text-2xl font-bold text-purple-700" id="total-ecosystem-value">€0.00</p>
-                            <p class="text-xs text-gray-600 mt-1">Total ecosystem value</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="sidebar-footer">
+                Toback Microhedging Platform © 2025<br>
+                Historical data: 2019-2024
             </div>
-        </div>
+        </aside>
         
-        <div class="grid grid-cols-1 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Hedging Strategy Components</h2>
-                <div class="chart-container">
-                    <canvas id="hedging-components-chart"></canvas>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Business Model Dashboard</h1>
+                    <div class="page-subtitle">Analyze performance and savings metrics based on historical gas price data</div>
+                </div>
+                <div class="period-badge">
+                    <div class="period-badge-dot"></div>
+                    <span id="current-period-badge">All Years (2019-2024)</span>
                 </div>
             </div>
             
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Cumulative Business Performance</h2>
-                <div class="chart-container">
-                    <canvas id="cumulative-performance-chart"></canvas>
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Revenue</div>
+                    <div class="stat-value" id="total-revenue">€0.00</div>
+                    <div class="stat-desc">Total revenue for the period</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">Monthly Premium</div>
+                    <div class="stat-value" id="monthly-premium">€0.00</div>
+                    <div class="stat-desc">Average monthly premium</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-title">Profit Margin</div>
+                    <div class="stat-value" id="profit-margin">0.00%</div>
+                    <div class="stat-desc">Overall profit margin</div>
                 </div>
             </div>
             
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Monthly P&L Analysis</h2>
-                <div class="chart-container">
-                    <canvas id="monthly-pnl-chart"></canvas>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-xl font-semibold mb-4 text-blue-600">Savings Generated for SMEs</h2>
-                <div class="flex mb-4">
-                    <div class="flex-1 text-sm bg-gray-100 p-2 rounded mr-2">
-                        <span class="font-semibold">Standard Market vs Our Model Prices</span>
-                        <p class="text-xs text-gray-600">Comparison between standard market price and our microhedged price</p>
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Enhanced Hedging Strategy Card -->
+                <div class="card col-span-6">
+                    <div class="card-header">
+                        <div class="card-title">Enhanced Hedging Strategy</div>
                     </div>
-                    <div class="flex-1 text-sm bg-gray-100 p-2 rounded">
-                        <span class="font-semibold">Generated Savings</span>
-                        <p class="text-xs text-gray-600">Cumulative savings for all SMEs in the selected period</p>
+                    <div class="card-body">
+                        <div class="strategy-card">
+                            <div class="strategy-details">
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Strategy Type:</span>
+                                    <span class="strategy-item-value">Multi-level with barrier options</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Volatility Reduction:</span>
+                                    <span class="strategy-item-value positive" id="volatility-reduction">0.00%</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Peak Price Reduction:</span>
+                                    <span class="strategy-item-value positive" id="peak-reduction">0.00%</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Protection Level:</span>
+                                    <span class="strategy-item-value" id="protection-level">Standard</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Options Cost:</span>
+                                    <span class="strategy-item-value" id="options-cost">€0.00</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Initial Investment:</span>
+                                    <span class="strategy-item-value" id="initial-investment">€0.00</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Hedging P&L:</span>
+                                    <span class="strategy-item-value" id="hedging-pnl">€0.00</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="savings-chart"></canvas>
+                
+                <!-- Savings Card -->
+                <div class="card col-span-6">
+                    <div class="card-header">
+                        <div class="card-title">Savings Generated for SMEs</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="savings-card">
+                            <div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Total Savings:</span>
+                                    <span class="strategy-item-value positive" id="total-savings">€0.00</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Avg. Savings per SME:</span>
+                                    <span class="strategy-item-value positive" id="avg-savings-per-sme">€0.00</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Avg. Monthly Savings:</span>
+                                    <span class="strategy-item-value" id="monthly-savings">€0.00</span>
+                                </div>
+                                <div class="strategy-item">
+                                    <span class="strategy-item-label">Avg. Savings %:</span>
+                                    <span class="strategy-item-value" id="percent-savings">0.00%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profit & Savings Summary -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <div class="card-title">Profit & Savings Summary</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="summary-grid">
+                            <div class="summary-item summary-business">
+                                <div class="summary-title">Business Profit</div>
+                                <div class="summary-value" id="total-profit">€0.00</div>
+                                <div class="summary-desc">Net profit after hedging costs</div>
+                            </div>
+                            <div class="summary-item summary-client">
+                                <div class="summary-title">SMEs Value Generated</div>
+                                <div class="summary-value" id="total-client-value">€0.00</div>
+                                <div class="summary-desc">Total savings for all clients</div>
+                            </div>
+                            <div class="summary-item summary-commission">
+                                <div class="summary-title">Savings Commission</div>
+                                <div class="summary-value" id="savings-commission">€0.00</div>
+                                <div class="summary-desc">Commission earned on savings</div>
+                            </div>
+                            <div class="summary-item summary-ecosystem">
+                                <div class="summary-title">Total Value Generated</div>
+                                <div class="summary-value" id="total-ecosystem-value">€0.00</div>
+                                <div class="summary-desc">Total ecosystem value</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Hedging Strategy Chart -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <div class="card-title">Enhanced Hedging Strategy Performance</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-description">
+                            <strong id="strategy-description">Base Protection: optimized hedging for normal market conditions</strong>
+                            <p>Analysis based on selected historical data</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="hedging-strategy-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Revenue Streams Chart -->
+                <div class="card col-span-6">
+                    <div class="card-header">
+                        <div class="card-title">Revenue Streams Breakdown</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenue-streams-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hedging Components Chart -->
+                <div class="card col-span-6">
+                    <div class="card-header">
+                        <div class="card-title">Hedging Strategy Components</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="hedging-components-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cumulative Performance Chart -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <div class="card-title">Cumulative Business Performance</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="cumulative-performance-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monthly P&L Chart -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <div class="card-title">Monthly P&L Analysis</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="monthly-pnl-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Savings Chart -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <div class="card-title">Savings Generated for SMEs</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-description">
+                            <strong>Standard Market vs Our Model Prices</strong>
+                            <p>Comparison between standard market price and our microhedged price</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="savings-chart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <footer class="text-center text-gray-500 text-sm mt-8">
-            <p>Toback Microhedging Business Model Dashboard © 2025</p>
-            <p class="mt-1">Using historical gas prices from January 2019 to December 2024</p>
-        </footer>
+        </main>
     </div>
     
+    <!-- Load required libraries at the end of the body to ensure they are loaded before being used -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Dati storici dei prezzi del gas da 2019 a 2024
-        const allHistoricalGasPrices = [
-            // 2019
-            { date: "2019-01-01", price: 19.850 },
-            { date: "2019-02-01", price: 17.815 },
-            { date: "2019-03-01", price: 14.215 },
-            { date: "2019-04-01", price: 14.390 },
-            { date: "2019-05-01", price: 11.205 },
-            { date: "2019-06-01", price: 10.115 },
-            { date: "2019-07-01", price: 11.000 },
-            { date: "2019-08-01", price: 12.795 },
-            { date: "2019-09-01", price: 16.390 },
-            { date: "2019-10-01", price: 16.135 },
-            { date: "2019-11-01", price: 16.330 },
-            { date: "2019-12-01", price: 12.050 },
-            
-            // 2020
-            { date: "2020-01-01", price: 9.755 },
-            { date: "2020-02-01", price: 8.875 },
-            { date: "2020-03-01", price: 6.900 },
-            { date: "2020-04-01", price: 6.220 },
-            { date: "2020-05-01", price: 4.385 },
-            { date: "2020-06-01", price: 6.165 },
-            { date: "2020-07-01", price: 6.025 },
-            { date: "2020-08-01", price: 11.240 },
-            { date: "2020-09-01", price: 13.285 },
-            { date: "2020-10-01", price: 14.060 },
-            { date: "2020-11-01", price: 15.140 },
-            { date: "2020-12-01", price: 19.125 },
-            
-            // 2021
-            { date: "2021-01-01", price: 19.820 },
-            { date: "2021-02-01", price: 15.695 },
-            { date: "2021-03-01", price: 18.995 },
-            { date: "2021-04-01", price: 23.285 },
-            { date: "2021-05-01", price: 24.930 },
-            { date: "2021-06-01", price: 34.620 },
-            { date: "2021-07-01", price: 40.755 },
-            { date: "2021-08-01", price: 50.340 },
-            { date: "2021-09-01", price: 97.775 },
-            { date: "2021-10-01", price: 64.865 },
-            { date: "2021-11-01", price: 92.515 },
-            { date: "2021-12-01", price: 70.345 },
-            
-            // 2022
-            { date: "2022-01-01", price: 84.670 },
-            { date: "2022-02-01", price: 98.595 },
-            { date: "2022-03-01", price: 125.905 },
-            { date: "2022-04-01", price: 99.450 },
-            { date: "2022-05-01", price: 94.005 },
-            { date: "2022-06-01", price: 144.515 },
-            { date: "2022-07-01", price: 190.915 },
-            { date: "2022-08-01", price: 239.905 },
-            { date: "2022-09-01", price: 188.800 },
-            { date: "2022-10-01", price: 123.350 },
-            { date: "2022-11-01", price: 146.395 },
-            { date: "2022-12-01", price: 76.315 },
-            
-            // 2023
-            { date: "2023-01-01", price: 57.350 },
-            { date: "2023-02-01", price: 46.665 },
-            { date: "2023-03-01", price: 47.845 },
-            { date: "2023-04-01", price: 38.540 },
-            { date: "2023-05-01", price: 26.850 },
-            { date: "2023-06-01", price: 37.103 },
-            { date: "2023-07-01", price: 28.365 },
-            { date: "2023-08-01", price: 35.030 },
-            { date: "2023-09-01", price: 41.859 },
-            { date: "2023-10-01", price: 48.005 },
-            { date: "2023-11-01", price: 42.090 },
-            { date: "2023-12-01", price: 32.350 },
-            
-            // 2024
-            { date: "2024-01-01", price: 30.235 },
-            { date: "2024-02-01", price: 24.865 },
-            { date: "2024-03-01", price: 27.340 },
-            { date: "2024-04-01", price: 29.120 },
-            { date: "2024-05-01", price: 34.223 },
-            { date: "2024-06-01", price: 34.480 },
-            { date: "2024-07-01", price: 35.870 },
-            { date: "2024-08-01", price: 39.825 },
-            { date: "2024-09-01", price: 39.044 },
-            { date: "2024-10-01", price: 40.588 },
-            { date: "2024-11-01", price: 47.811 },
-            { date: "2024-12-01", price: 48.889 }
-        ];
-        
-        // Organizza i dati per anno
-        const dataByYear = {
-            '2019': allHistoricalGasPrices.slice(0, 12),
-            '2020': allHistoricalGasPrices.slice(12, 24),
-            '2021': allHistoricalGasPrices.slice(24, 36),
-            '2022': allHistoricalGasPrices.slice(36, 48),
-            '2023': allHistoricalGasPrices.slice(48, 60),
-            '2024': allHistoricalGasPrices.slice(60, 72),
-            '2023-2024': allHistoricalGasPrices.slice(48, 72),
-            'all': allHistoricalGasPrices
-        };
-        
-        // Imposta i dati attivi inizialmente (tutti gli anni)
-        let activeHistoricalGasPrices = allHistoricalGasPrices;
-        let activePeriod = 'all';
-        
-        // Estrae i prezzi dai dati storici
-        function updateHistoricalPrices() {
-            return activeHistoricalGasPrices.map(item => item.price);
-        }
-        
-        function updateHistoricalDates() {
-            return activeHistoricalGasPrices.map(item => item.date);
-        }
-        
-        // Parametri predefiniti
-        const params = {
-            numSMEs: 100,
-            avgConsumption: 150000, // kWh
-            riskFreeRate: 0.03, // 3%
-            timeToMaturity: 1, // 1 anno
-            premiumPercentage: 2, // 2%
-            hedgingPercentage: 75, // 75% copertura di hedging
-            annualCarryCost: 0.05, // 5% costo annuale di carry
-        };
-        
-        // Formatta i numeri per la visualizzazione
-        function formatNumber(num) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'decimal',
-                maximumFractionDigits: 2,
-            }).format(num);
-        }
-        
-        // Formatta la valuta
-        function formatCurrency(num) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'EUR',
-                maximumFractionDigits: 2,
-            }).format(num);
-        }
-        
-        // Funzioni del modello Black-Scholes
-        function normalCDF(x) {
-            return (1 + math.erf(x / math.sqrt(2))) / 2;
-        }
-        
-        function callOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility) {
-            if (timeToMaturity <= 0) return Math.max(0, spotPrice - strikePrice);
-            
-            const d1 = (math.log(spotPrice / strikePrice) + (riskFreeRate + volatility * volatility / 2) * timeToMaturity) / (volatility * math.sqrt(timeToMaturity));
-            const d2 = d1 - volatility * math.sqrt(timeToMaturity);
-            
-            const nd1 = normalCDF(d1);
-            const nd2 = normalCDF(d2);
-            
-            return spotPrice * nd1 - strikePrice * math.exp(-riskFreeRate * timeToMaturity) * nd2;
-        }
-        
-        function putOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility) {
-            if (timeToMaturity <= 0) return Math.max(0, strikePrice - spotPrice);
-            
-            const call = callOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility);
-            return call + strikePrice * math.exp(-riskFreeRate * timeToMaturity) - spotPrice;
-        }
-        
-        // Calcola il costo SME con alpha=0.65 e beta=20 €/MWh fissi
-        function calculateSMECost(futurePrice) {
-            const alpha = 0.65;
-            const beta = 20;
-            return alpha * futurePrice + beta;
-        }
-        
-        // Calcola la volatilità storica
-        function calculateHistoricalVolatility(prices) {
-            const logReturns = [];
-            for (let i = 1; i < prices.length; i++) {
-                logReturns.push(Math.log(prices[i] / prices[i-1]));
+        // Wait for Chart.js to fully load before using it
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if Chart is defined before proceeding
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js is not loaded. Please check your internet connection or try a different CDN.');
+                alert('Error loading Chart.js. Please refresh the page or check your internet connection.');
+                return;
             }
             
-            const mean = logReturns.reduce((sum, val) => sum + val, 0) / logReturns.length;
-            const variance = logReturns.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / logReturns.length;
-            const stdDev = Math.sqrt(variance);
-            
-            return stdDev * Math.sqrt(12); // Annualizza la volatilità mensile
-        }
-        
-        // Calcola P&L di Hedging corretto
-        function calculateHedgingPnL(
-            historicalPrices,
-            contractPrice,
-            strikePrice,
-            consumption,
-            timeToMaturity,
-            riskFreeRate,
-            volatility,
-            hedgingPercentage,
-            annualCarryCost
-        ) {
-            // Applica la percentuale di hedging al consumo
-            const hedgedConsumption = consumption * (hedgingPercentage / 100);
-            
-            // Calcola il costo iniziale dell'opzione
-            const initialCallPrice = callOptionPrice(
-                contractPrice, 
-                strikePrice, 
-                timeToMaturity, 
-                riskFreeRate, 
-                volatility
-            );
-            
-            const initialPutPrice = putOptionPrice(
-                contractPrice, 
-                strikePrice, 
-                timeToMaturity, 
-                riskFreeRate, 
-                volatility
-            );
-            
-            const optionsCost = (initialCallPrice + initialPutPrice) * hedgedConsumption;
-            
-            // Array per i dati mensili di mark-to-market e componenti P&L
-            const monthlyData = [];
-            
-            // Calcola i valori mensili di mark-to-market
-            for (let i = 0; i < historicalPrices.length; i++) {
-                const currentPrice = historicalPrices[i];
-                const monthsElapsed = i;
-                const remainingMonths = Math.max(0, 12 - monthsElapsed);
-                const remainingTime = remainingMonths / 12;
+            // Historical gas prices data
+            const allHistoricalGasPrices = [
+                // 2019
+                { date: "2019-01-01", price: 19.850 },
+                { date: "2019-02-01", price: 17.815 },
+                { date: "2019-03-01", price: 14.215 },
+                { date: "2019-04-01", price: 14.390 },
+                { date: "2019-05-01", price: 11.205 },
+                { date: "2019-06-01", price: 10.115 },
+                { date: "2019-07-01", price: 11.000 },
+                { date: "2019-08-01", price: 12.795 },
+                { date: "2019-09-01", price: 16.390 },
+                { date: "2019-10-01", price: 16.135 },
+                { date: "2019-11-01", price: 16.330 },
+                { date: "2019-12-01", price: 12.050 },
                 
-                // Calcola il valore mark-to-market dello swap
-                const swapMtM = (contractPrice - currentPrice) * hedgedConsumption;
+                // 2020
+                { date: "2020-01-01", price: 9.755 },
+                { date: "2020-02-01", price: 8.875 },
+                { date: "2020-03-01", price: 6.900 },
+                { date: "2020-04-01", price: 6.220 },
+                { date: "2020-05-01", price: 4.385 },
+                { date: "2020-06-01", price: 6.165 },
+                { date: "2020-07-01", price: 6.025 },
+                { date: "2020-08-01", price: 11.240 },
+                { date: "2020-09-01", price: 13.285 },
+                { date: "2020-10-01", price: 14.060 },
+                { date: "2020-11-01", price: 15.140 },
+                { date: "2020-12-01", price: 19.125 },
                 
-                // Calcola il valore mark-to-market delle opzioni
-                let optionsMtM = 0;
+                // 2021
+                { date: "2021-01-01", price: 19.820 },
+                { date: "2021-02-01", price: 15.695 },
+                { date: "2021-03-01", price: 18.995 },
+                { date: "2021-04-01", price: 23.285 },
+                { date: "2021-05-01", price: 24.930 },
+                { date: "2021-06-01", price: 34.620 },
+                { date: "2021-07-01", price: 40.755 },
+                { date: "2021-08-01", price: 50.340 },
+                { date: "2021-09-01", price: 97.775 },
+                { date: "2021-10-01", price: 64.865 },
+                { date: "2021-11-01", price: 92.515 },
+                { date: "2021-12-01", price: 70.345 },
                 
-                if (remainingTime <= 0) {
-                    // A scadenza, usa il valore intrinseco
-                    const callPayoff = Math.max(0, currentPrice - strikePrice) * hedgedConsumption;
-                    const putPayoff = Math.max(0, strikePrice - currentPrice) * hedgedConsumption;
-                    optionsMtM = callPayoff + putPayoff - optionsCost;
-                } else {
-                    // Prima della scadenza, usa la valutazione Black-Scholes
-                    const currentCallPrice = callOptionPrice(
-                        currentPrice, 
-                        strikePrice, 
-                        remainingTime, 
-                        riskFreeRate, 
-                        volatility
-                    );
-                    
-                    const currentPutPrice = putOptionPrice(
-                        currentPrice, 
-                        strikePrice, 
-                        remainingTime, 
-                        riskFreeRate, 
-                        volatility
-                    );
-                    
-                    optionsMtM = (currentCallPrice + currentPutPrice) * hedgedConsumption - optionsCost;
+                // 2022
+                { date: "2022-01-01", price: 84.670 },
+                { date: "2022-02-01", price: 98.595 },
+                { date: "2022-03-01", price: 125.905 },
+                { date: "2022-04-01", price: 99.450 },
+                { date: "2022-05-01", price: 94.005 },
+                { date: "2022-06-01", price: 144.515 },
+                { date: "2022-07-01", price: 190.915 },
+                { date: "2022-08-01", price: 239.905 },
+                { date: "2022-09-01", price: 188.800 },
+                { date: "2022-10-01", price: 123.350 },
+                { date: "2022-11-01", price: 146.395 },
+                { date: "2022-12-01", price: 76.315 },
+                
+                // 2023
+                { date: "2023-01-01", price: 57.350 },
+                { date: "2023-02-01", price: 46.665 },
+                { date: "2023-03-01", price: 47.845 },
+                { date: "2023-04-01", price: 38.540 },
+                { date: "2023-05-01", price: 26.850 },
+                { date: "2023-06-01", price: 37.103 },
+                { date: "2023-07-01", price: 28.365 },
+                { date: "2023-08-01", price: 35.030 },
+                { date: "2023-09-01", price: 41.859 },
+                { date: "2023-10-01", price: 48.005 },
+                { date: "2023-11-01", price: 42.090 },
+                { date: "2023-12-01", price: 32.350 },
+                
+                // 2024
+                { date: "2024-01-01", price: 30.235 },
+                { date: "2024-02-01", price: 24.865 },
+                { date: "2024-03-01", price: 27.340 },
+                { date: "2024-04-01", price: 29.120 },
+                { date: "2024-05-01", price: 34.223 },
+                { date: "2024-06-01", price: 34.480 },
+                { date: "2024-07-01", price: 35.870 },
+                { date: "2024-08-01", price: 39.825 },
+                { date: "2024-09-01", price: 39.044 },
+                { date: "2024-10-01", price: 40.588 },
+                { date: "2024-11-01", price: 47.811 },
+                { date: "2024-12-01", price: 48.889 }
+            ];
+            
+            // Organize data by year
+            const dataByYear = {
+                '2019': allHistoricalGasPrices.slice(0, 12),
+                '2020': allHistoricalGasPrices.slice(12, 24),
+                '2021': allHistoricalGasPrices.slice(24, 36),
+                '2022': allHistoricalGasPrices.slice(36, 48),
+                '2023': allHistoricalGasPrices.slice(48, 60),
+                '2024': allHistoricalGasPrices.slice(60, 72),
+                '2023-2024': allHistoricalGasPrices.slice(48, 72),
+                'all': allHistoricalGasPrices
+            };
+            
+            // Set initial active data (all years)
+            let activeHistoricalGasPrices = allHistoricalGasPrices;
+            let activePeriod = 'all';
+            let hedgingScenario = 'normal';
+            
+            // Chart instances
+            let hedgingStrategyChart;
+            let revenueStreamsChart;
+            let hedgingComponentsChart;
+            let cumulativePerformanceChart;
+            let monthlyPnLChart;
+            let savingsChart;
+            
+            // Business parameters
+            const params = {
+                numSMEs: 50,
+                avgConsumption: 100000, // kWh
+                premiumPercentage: 1.0, // 1%
+                hedgingPercentage: 95, // 95% hedging coverage
+                annualCarryCost: 0.05, // 5% annual carry cost
+                savingsCommissionPercent: 5.0, // 5% commission on savings
+                riskFreeRate: 0.03, // 3%
+                timeToMaturity: 1, // 1 year
+            };
+
+            // Chart.js global configuration
+            Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+            Chart.defaults.color = "#64748b";
+            Chart.defaults.scale.grid.color = "rgba(226, 232, 240, 0.6)";
+            Chart.defaults.plugins.tooltip.backgroundColor = "rgba(15, 23, 42, 0.8)";
+            Chart.defaults.plugins.tooltip.padding = 12;
+            Chart.defaults.plugins.tooltip.cornerRadius = 8;
+            Chart.defaults.plugins.tooltip.titleFont = { weight: "600", size: 12 };
+            Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+            Chart.defaults.plugins.tooltip.borderWidth = 0;
+            Chart.defaults.plugins.title.font = { weight: "500", size: 14 };
+            Chart.defaults.plugins.legend.labels.boxWidth = 12;
+            Chart.defaults.plugins.legend.labels.boxHeight = 12;
+            Chart.defaults.plugins.legend.labels.font = { size: 12 };
+            
+            // Format numbers and currency
+            function formatNumber(num) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    maximumFractionDigits: 2,
+                }).format(num);
+            }
+            
+            function formatCurrency(num) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'EUR',
+                    maximumFractionDigits: 2,
+                }).format(num);
+            }
+            
+            // Black-Scholes model functions
+            function normalCDF(x) {
+                return (1 + math.erf(x / Math.sqrt(2))) / 2;
+            }
+            
+            function callOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility) {
+                if (timeToMaturity <= 0) return Math.max(0, spotPrice - strikePrice);
+                
+                const d1 = (Math.log(spotPrice / strikePrice) + (riskFreeRate + volatility * volatility / 2) * timeToMaturity) / (volatility * Math.sqrt(timeToMaturity));
+                const d2 = d1 - volatility * Math.sqrt(timeToMaturity);
+                
+                const nd1 = normalCDF(d1);
+                const nd2 = normalCDF(d2);
+                
+                return spotPrice * nd1 - strikePrice * Math.exp(-riskFreeRate * timeToMaturity) * nd2;
+            }
+            
+            function putOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility) {
+                if (timeToMaturity <= 0) return Math.max(0, strikePrice - spotPrice);
+                
+                const call = callOptionPrice(spotPrice, strikePrice, timeToMaturity, riskFreeRate, volatility);
+                return call + strikePrice * Math.exp(-riskFreeRate * timeToMaturity) - spotPrice;
+            }
+            
+            // Calculate SME cost with alpha=0.65 and beta=20 €/MWh fixed
+            function calculateSMECost(futurePrice) {
+                const alpha = 0.65;
+                const beta = 20;
+                
+                // Calculate standard market price (for comparison)
+                const marketMarkup = 0.15; // 15% markup
+                const marketFixedCost = 5; // €5/MWh fixed cost
+                const standardMarketPrice = futurePrice * (1 + marketMarkup) + marketFixedCost;
+                
+                // Calculate our base price
+                const basePrice = alpha * futurePrice + beta;
+                
+                // Ensure our price is never higher than market price
+                return Math.min(basePrice, standardMarketPrice * 0.98); // 2% below market price at minimum
+            }
+            
+            // Calculate standard deviation
+            function calculateStandardDeviation(values) {
+                if (values.length === 0) return 0;
+                
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+                
+                return Math.sqrt(variance);
+            }
+            
+            // Calculate historical volatility from price series
+            function calculateHistoricalVolatility(prices) {
+                const logReturns = [];
+                for (let i = 1; i < prices.length; i++) {
+                    logReturns.push(Math.log(prices[i] / prices[i-1]));
+                
                 }
                 
-                // Calcola il costo cumulativo di carry fino a questo punto
-                const carryCost = i > 0 ? optionsCost * (annualCarryCost * (i / 12)) : 0;
+                const mean = logReturns.reduce((sum, val) => sum + val, 0) / logReturns.length;
+                const variance = logReturns.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / logReturns.length;
+                const stdDev = Math.sqrt(variance);
                 
-                // Valore totale mark-to-market
-                const totalMtM = swapMtM + optionsMtM - carryCost;
-                
-                monthlyData.push({
-                    swapMtM,
-                    optionsMtM,
-                    carryCost,
-                    totalMtM
-                });
+                return stdDev * Math.sqrt(12)* 0.7; // Annualize monthly volatility
             }
             
-            // Calcola P&L mensili (variazioni nel valore MtM)
-            const pnlSeries = [];
-            const pnlComponents = [];
-            
-            for (let i = 1; i < monthlyData.length; i++) {
-                const current = monthlyData[i];
-                const previous = monthlyData[i-1];
-                
-                // Variazioni mensili MtM = P&L mensile
-                const swapPnL = current.swapMtM - previous.swapMtM;
-                const optionPnL = current.optionsMtM - previous.optionsMtM;
-                const carryPnL = previous.carryCost - current.carryCost; // Il segno è invertito perché è un costo
-                
-                const netPnL = swapPnL + optionPnL + carryPnL;
-                
-                pnlSeries.push(netPnL);
-                pnlComponents.push({
-                    swapPayoff: swapPnL,
-                    optionPayoff: optionPnL,
-                    carryCost: carryPnL,
-                    netPnL
-                });
-            }
-            
-            return { 
-                pnlSeries, 
-                pnlComponents,
-                monthlyData,
-                optionPrices: { call: initialCallPrice, put: initialPutPrice }
-            };
-        }
-        
-        // Calcola ROI
-        function calculateROI(pnlSeries, initialInvestment) {
-            if (initialInvestment === 0) return 0;
-            const finalPnL = pnlSeries[pnlSeries.length - 1];
-            return (finalPnL / initialInvestment) * 100;
-        }
-        
-        // Calcola il risparmio cumulato rispetto ai prezzi standard di mercato
-        function calculateCumulativeSavings(historicalPrices, avgConsumptionMWh, numSMEs) {
-            // Markup standard di mercato (15% sopra il prezzo spot + 5€/MWh di costi fissi)
-            const marketMarkup = 0.15;
-            const marketFixedCost = 5;
-            
-            const savings = [];
-            let cumulativeSaving = 0;
-            
-            for (let i = 0; i < historicalPrices.length; i++) {
-                const spotPrice = historicalPrices[i];
-                // Prezzo standard di mercato con markup
-                const standardMarketPrice = spotPrice * (1 + marketMarkup) + marketFixedCost;
-                // Nostro prezzo con il modello di microhedging
-                const ourPrice = calculateSMECost(spotPrice);
-                
-                // Calcola il risparmio mensile: (prezzo mercato - nostro prezzo) * consumo totale
-                const monthlySaving = (standardMarketPrice - ourPrice) * avgConsumptionMWh * numSMEs / 1000; // diviso 1000 per passare da kWh a MWh
-                
-                cumulativeSaving += monthlySaving;
-                savings.push({
-                    monthSaving: monthlySaving,
-                    cumulativeSaving: cumulativeSaving,
-                    marketPrice: standardMarketPrice,
-                    ourPrice: ourPrice,
-                    date: new Date(activeHistoricalGasPrices[i].date)
-                });
-            }
-            
-            return savings;
-        }
-        
-        // Memorizza le istanze dei grafici in modo da poterle aggiornare
-        let hedgingComponentsChart;
-        let cumulativePerformanceChart;
-        let monthlyPnLChart;
-        
-        // Funzione per eseguire la simulazione e aggiornare l'UI
-        function runSimulation() {
-            const historicalPrices = updateHistoricalPrices();
-            const historicalDates = updateHistoricalDates();
-            
-            // Calcola la volatilità una volta
-            const volatility = calculateHistoricalVolatility(historicalPrices);
-            
-            // Prezzo contrattuale iniziale (primo prezzo nei dati storici)
-            const contractPrice = historicalPrices[0];
-            const strikePrice = contractPrice;
-            
-            // Calcola i costi SME
-            const smeCosts = historicalPrices.map(price => calculateSMECost(price));
-            
-            // Converti il consumo da kWh a MWh per coerenza
-            const avgConsumptionMWh = params.avgConsumption / 1000;
-            const totalConsumptionMWh = params.numSMEs * avgConsumptionMWh;
-            
-            // Calcola P&L di hedging con implementazione corretta
-            const hedgingResult = calculateHedgingPnL(
+            // Enhanced hedging function
+            function calculateEnhancedHedgingPnL(
                 historicalPrices, 
                 contractPrice, 
-                strikePrice, 
-                totalConsumptionMWh, 
-                params.timeToMaturity, 
-                params.riskFreeRate, 
+                consumption, 
+                timeToMaturity, 
+                riskFreeRate, 
                 volatility,
-                params.hedgingPercentage,
-                params.annualCarryCost
-            );
-            
-            // Usa i dati mensili dall'implementazione corretta
-            const monthlyData = hedgingResult.monthlyData;
-            const hedgingPnL = hedgingResult.pnlSeries;
-            const hedgingComponents = hedgingResult.pnlComponents;
-            const optionPrices = hedgingResult.optionPrices;
-            
-            // Calcola P&L del modello di business con implementazione corretta
-            const businessPnL = [];
-            
-            for (let i = 1; i < historicalPrices.length; i++) {
-                const futurePrice = historicalPrices[i];
-                const smeCost = calculateSMECost(futurePrice);
+                hedgingPercentage,
+                annualCarryCost
+            ) {
+                // Apply hedging percentage to consumption
+                const hedgedConsumption = consumption * (hedgingPercentage / 100);
                 
-                const totalEnergyValue = smeCost * totalConsumptionMWh;
-                const premium = totalEnergyValue * (params.premiumPercentage / 100);
+                // Define strike price at initial contract price
+                const strikePrice = contractPrice;
                 
-                // Usa il P&L di hedging dal calcolo corretto
-                const hedgingMonthlyPnL = i > 1 ? hedgingPnL[i-2] : 0;
+                // Calculate initial option costs
+                const initialCallPrice = callOptionPrice(
+                    contractPrice, 
+                    strikePrice, 
+                    timeToMaturity, 
+                    riskFreeRate, 
+                    volatility
+                );
                 
-                const monthlyPnL = premium + hedgingMonthlyPnL;
-                businessPnL.push(monthlyPnL);
-            }
-            
-            // Calcola P&L cumulativi
-            const cumulativeBusinessPnL = [];
-            let runningBusinessTotal = 0;
-            for (const pnl of businessPnL) {
-                runningBusinessTotal += pnl;
-                cumulativeBusinessPnL.push(runningBusinessTotal);
-            }
-            
-            // Calcola l'investimento iniziale (costo delle opzioni)
-            const initialInvestment = (optionPrices.call + optionPrices.put) * totalConsumptionMWh;
-            
-            // Calcola ROI e margine di profitto
-            const roi = calculateROI(cumulativeBusinessPnL, initialInvestment);
-            const profitMargin = cumulativeBusinessPnL.length > 0 
-                ? (cumulativeBusinessPnL[cumulativeBusinessPnL.length - 1] / initialInvestment) * 100 
-                : 0;
-            
-            // Prepara i dati per i grafici
-            const chartData = historicalDates.slice(1).map((date, i) => {
-                const mtmIndex = i + 1;
+                const initialPutPrice = putOptionPrice(
+                    contractPrice, 
+                    strikePrice, 
+                    timeToMaturity, 
+                    riskFreeRate, 
+                    volatility
+                );
+                
+                const optionsCost = (initialCallPrice + initialPutPrice) * hedgedConsumption;
+                
+                // Array for monthly mark-to-market data
+                const monthlyData = [];
+                
+                // Calculate monthly mark-to-market values
+                for (let i = 0; i < historicalPrices.length; i++) {
+                    const currentPrice = historicalPrices[i];
+                    const monthsElapsed = i;
+                    const remainingMonths = Math.max(0, 12 - monthsElapsed);
+                    const remainingTime = remainingMonths / 12;
+                    
+                    // Calculate swap MtM
+                    let swapMtM = (contractPrice - currentPrice) * hedgedConsumption;
+                    
+                    // Advanced protection logic for the enhanced strategy
+                    if (hedgingScenario === 'extreme') {
+                        if (currentPrice > 80) {
+                            // Additional protection for extreme price spikes
+                            swapMtM = swapMtM * 1.5;
+                        }
+                    }
+                    
+                    // Calculate options MtM
+                    let optionsMtM = 0;
+                    
+                    if (remainingTime <= 0) {
+                        // At expiry, use intrinsic value
+                        const callPayoff = Math.max(0, currentPrice - strikePrice) * hedgedConsumption;
+                        const putPayoff = Math.max(0, strikePrice - currentPrice) * hedgedConsumption;
+                        optionsMtM = callPayoff + putPayoff - optionsCost;
+                    } else {
+                        // Before expiry, use Black-Scholes valuation
+                        const currentCallPrice = callOptionPrice(
+                            currentPrice, 
+                            strikePrice, 
+                            remainingTime, 
+                            riskFreeRate, 
+                            volatility
+                        );
+                        
+                        const currentPutPrice = putOptionPrice(
+                            currentPrice, 
+                            strikePrice, 
+                            remainingTime, 
+                            riskFreeRate, 
+                            volatility
+                        );
+                        
+                        optionsMtM = (currentCallPrice + currentPutPrice) * hedgedConsumption - optionsCost;
+                    }
+                    
+                    // Apply advanced protection for extreme scenario
+                    if (hedgingScenario === 'extreme') {
+                        if (currentPrice > 80) {
+                            // Enhanced option protection in extreme scenarios
+                            optionsMtM = optionsMtM * 2;
+                        } else if (currentPrice < 15) {
+                            // Extra floor protection
+                            optionsMtM = Math.max(optionsMtM, -optionsCost * 0.5);
+                        }
+                    }
+                    
+                    // Calculate cumulative carry cost
+                    const carryCost = i > 0 ? optionsCost * (annualCarryCost * (i / 12)) : 0;
+                    
+                    // Total mark-to-market value
+                    const totalMtM = swapMtM + optionsMtM - carryCost;
+                    
+                    monthlyData.push({
+                        swapMtM,
+                        optionsMtM,
+                        carryCost,
+                        totalMtM
+                    });
+                }
+                
+                // Calculate monthly P&L (changes in MtM value)
+                const pnlSeries = [];
+                const pnlComponents = [];
+                
+                for (let i = 1; i < monthlyData.length; i++) {
+                    const current = monthlyData[i];
+                    const previous = monthlyData[i-1];
+                    
+                    // Monthly MtM changes = monthly P&L
+                    const swapPnL = current.swapMtM - previous.swapMtM;
+                    const optionPnL = current.optionsMtM - previous.optionsMtM;
+                    const carryPnL = previous.carryCost - current.carryCost; // Sign inverted as it's a cost
+                    
+                    const netPnL = swapPnL + optionPnL + carryPnL;
+                    
+                    pnlSeries.push(netPnL);
+                    pnlComponents.push({
+                        swapPayoff: swapPnL,
+                        optionPayoff: optionPnL,
+                        carryCost: carryPnL,
+                        netPnL
+                    });
+                }
+                // Calcola il P&L realizzato a fine periodo
+                let realizedHedgingPnL = 0;
+                if (monthlyData.length >= 12) {
+                    // Se abbiamo almeno 12 mesi, calcoliamo il P&L realizzato nell'ultimo mese dell'anno
+                    realizedHedgingPnL = monthlyData[11].totalMtM;
+                } else if (monthlyData.length > 0) {
+                    // Se abbiamo meno di 12 mesi, usiamo l'ultimo mese disponibile
+                    realizedHedgingPnL = monthlyData[monthlyData.length - 1].totalMtM;
+}
+                
                 return {
-                    date,
-                    gasPrice: historicalPrices[mtmIndex],
-                    smeCost: smeCosts[mtmIndex],
-                    hedgingMtM: monthlyData[mtmIndex]?.totalMtM || 0,
-                    hedgingPnL: hedgingPnL[i] || 0,
-                    businessPnL: businessPnL[i] || 0,
-                    cumulativeBusinessPnL: cumulativeBusinessPnL[i] || 0,
-                    swapPayoff: hedgingComponents[i]?.swapPayoff || 0,
-                    optionPayoff: hedgingComponents[i]?.optionPayoff || 0,
-                    carryCost: hedgingComponents[i]?.carryCost || 0
+                    pnlSeries,
+                    pnlComponents,
+                    monthlyData,
+                    optionPrices: { call: initialCallPrice, put: initialPutPrice },
+                    totalCost: optionsCost,
+                    realizedHedgingPnL: realizedHedgingPnL   // Il vero P&L realizzato a fine periodo
                 };
-            });
-            
-            // Calcola il ricavo medio mensile da premio
-            const avgMonthlyPremium = businessPnL.reduce((sum, pnl, i) => {
-                return sum + (pnl - (hedgingPnL[i] || 0));
-            }, 0) / businessPnL.length;
-            
-            // Calcola il risparmio per le SMEs
-            const savingsData = calculateCumulativeSavings(historicalPrices, avgConsumptionMWh, params.numSMEs);
-            
-            // Calcola i risparmi totali e medi
-            const totalSavings = savingsData.length > 0 ? savingsData[savingsData.length - 1].cumulativeSaving : 0;
-            const avgSavingsPerSME = totalSavings / params.numSMEs;
-            const avgMonthlySavings = totalSavings / savingsData.length;
-            
-            // Calcola il risparmio percentuale medio
-            let avgPercentSavings = 0;
-            if (savingsData.length > 0) {
-                avgPercentSavings = savingsData.reduce((sum, item) => {
-                    return sum + ((item.marketPrice - item.ourPrice) / item.marketPrice) * 100;
-                }, 0) / savingsData.length;
             }
             
-            // Calcola i valori totali per l'ecosistema
-            const totalProfit = runningBusinessTotal;
-            const totalClientValue = totalSavings; 
-            const totalEcosystemValue = totalProfit + totalClientValue;
-            
-            // Aggiorna le metriche
-            document.getElementById('total-revenue').textContent = formatCurrency(runningBusinessTotal);
-            document.getElementById('monthly-premium').textContent = formatCurrency(avgMonthlyPremium);
-            
-            const profitMarginElement = document.getElementById('profit-margin');
-            profitMarginElement.textContent = formatNumber(profitMargin) + '%';
-            profitMarginElement.className = profitMargin >= 0 ? 'text-2xl font-bold positive' : 'text-2xl font-bold negative';
-            
-            document.getElementById('options-cost').textContent = formatCurrency(optionPrices.call + optionPrices.put);
-            document.getElementById('initial-investment').textContent = formatCurrency(initialInvestment);
-            
-            const hedgingPnLElement = document.getElementById('hedging-pnl');
-            const finalHedgingPnL = monthlyData[monthlyData.length - 1]?.totalMtM || 0;
-            hedgingPnLElement.textContent = formatCurrency(finalHedgingPnL);
-            hedgingPnLElement.className = finalHedgingPnL >= 0 ? 'positive' : 'negative';
-            
-            // Aggiorna le nuove metriche di risparmio
-            document.getElementById('total-savings').textContent = formatCurrency(totalSavings);
-            document.getElementById('avg-savings-per-sme').textContent = formatCurrency(avgSavingsPerSME);
-            document.getElementById('monthly-savings').textContent = formatCurrency(avgMonthlySavings);
-            document.getElementById('percent-savings').textContent = formatNumber(avgPercentSavings) + '%';
-            
-            // Aggiorna i valori del riepilogo
-            document.getElementById('total-profit').textContent = formatCurrency(totalProfit);
-            document.getElementById('total-client-value').textContent = formatCurrency(totalClientValue);
-            document.getElementById('total-ecosystem-value').textContent = formatCurrency(totalEcosystemValue);
-            
-            // Formatta le date per i grafici
-            const formattedDates = chartData.map(item => {
-                const date = new Date(item.date);
-                return `${date.getMonth()+1}/${date.getFullYear().toString().substr(2, 2)}`;
-            });
-            
-            // Aggiorna il grafico dei componenti di Hedging
-            if (hedgingComponentsChart) {
-                hedgingComponentsChart.destroy();
-            }
-            
-            const hedgingComponentsCtx = document.getElementById('hedging-components-chart').getContext('2d');
-            hedgingComponentsChart = new Chart(hedgingComponentsCtx, {
-                type: 'bar',
-                data: {
-                    labels: formattedDates,
-                    datasets: [
-                        {
-                            label: 'Gas Swap Payoff',
-                            data: chartData.map(item => item.swapPayoff),
-                            backgroundColor: '#3B82F6',
-                        },
-                        {
-                            label: 'Options Payoff',
-                            data: chartData.map(item => item.optionPayoff),
-                            backgroundColor: '#6366F1',
-                        },
-                        {
-                            label: 'Carry Cost',
-                            data: chartData.map(item => item.carryCost),
-                            backgroundColor: '#EF4444',
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            stacked: true
-                        },
-                        y: {
-                            stacked: true
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-            
-            // Aggiorna il grafico della performance cumulativa
-            if (cumulativePerformanceChart) {
-                cumulativePerformanceChart.destroy();
-            }
-            
-            const cumulativePerformanceCtx = document.getElementById('cumulative-performance-chart').getContext('2d');
-            cumulativePerformanceChart = new Chart(cumulativePerformanceCtx, {
-                type: 'line',
-                data: {
-                    labels: formattedDates,
-                    datasets: [
-                        {
-                            label: 'Cumulative Business P&L',
-                            data: chartData.map(item => item.cumulativeBusinessPnL),
-                            borderColor: '#3B82F6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Hedging Mark-to-Market',
-                            data: chartData.map(item => item.hedgingMtM),
-                            borderColor: '#6366F1',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                            fill: true,
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-            
-            // Aggiorna il grafico P&L mensile
-            if (monthlyPnLChart) {
-                monthlyPnLChart.destroy();
-            }
-            
-            const monthlyPnLCtx = document.getElementById('monthly-pnl-chart').getContext('2d');
-            monthlyPnLChart = new Chart(monthlyPnLCtx, {
-                type: 'bar',
-                data: {
-                    labels: formattedDates,
-                    datasets: [
-                        {
-                            label: 'Monthly Business P&L',
-                            data: chartData.map(item => item.businessPnL),
-                            backgroundColor: '#3B82F6'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-            
-            // Nuovo grafico per il risparmio
-            let savingsChart;
-            if (document.getElementById('savings-chart')) {
-                // Prepara i dati per il grafico del risparmio
-                const savingsChartCtx = document.getElementById('savings-chart').getContext('2d');
+            // Calculate cumulative savings
+            function calculateCumulativeSavings(historicalPrices, avgConsumptionMWh, numSMEs, savingsCommissionPercent) {
+                // Standard market markup (15% above spot price + 5€/MWh fixed costs)
+                const marketMarkup = 0.15;
+                const marketFixedCost = 5;
                 
-                // Ottieni le date formattate per questo grafico
-                const savingsDates = savingsData.map(item => {
-                    const date = new Date(item.date);
-                    return `${date.getMonth()+1}/${date.getFullYear().toString().substr(2, 2)}`;
+                const savings = [];
+                let cumulativeSaving = 0;
+                let cumulativeCommission = 0;
+                
+                for (let i = 0; i < historicalPrices.length; i++) {
+                    const spotPrice = historicalPrices[i];
+                    
+                    // Standard market price with markup
+                    const standardMarketPrice = spotPrice * (1 + marketMarkup) + marketFixedCost;
+                    
+                    // Our price with the microhedging model
+                    let ourPrice;
+                    if (hedgingScenario === 'normal') {
+                        ourPrice = calculateSMECost(spotPrice);
+                    } else {
+                        // In extreme scenario, use the enhanced hedging price ceiling
+                        if (spotPrice > 70) {
+                            ourPrice = Math.min(60, standardMarketPrice * 0.95); // Price ceiling with enhanced hedging
+                        } else if (spotPrice < 20) {
+                            ourPrice = Math.min(32, standardMarketPrice * 0.95); // Price floor with enhanced hedging
+                        } else {
+                            ourPrice = calculateSMECost(spotPrice);
+                        }
+                    }
+                    
+                    // Ensure our price is never higher than the market price (at least 2% discount)
+                    ourPrice = Math.min(ourPrice, standardMarketPrice * 0.98);
+                    
+                    // Calculate monthly savings: (market price - our price) * total consumption
+                    // Ensure savings are never negative
+                    const priceDifference = Math.max(0, standardMarketPrice - ourPrice);
+                    const monthlySaving = priceDifference * avgConsumptionMWh * numSMEs; // Already in MWh
+                    
+                    // Calculate commission on savings (only if positive)
+                    let monthlyCommission = 0;
+                    if (monthlySaving > 0) {
+                        monthlyCommission = monthlySaving * (savingsCommissionPercent / 100);
+                    }
+                    
+                    cumulativeSaving += monthlySaving;
+                    cumulativeCommission += monthlyCommission;
+                    
+                    savings.push({
+                        monthSaving: monthlySaving,
+                        cumulativeSaving: cumulativeSaving,
+                        monthlyCommission: monthlyCommission,
+                        cumulativeCommission: cumulativeCommission,
+                        marketPrice: standardMarketPrice,
+                        ourPrice: ourPrice,
+                        date: new Date(activeHistoricalGasPrices[i].date)
+                    });
+                }
+                
+                return savings;
+            }
+            
+            // Generate enhanced strategy data from historical prices
+            function generateEnhancedStrategyData(historicalPrices) {
+                return historicalPrices.map(item => {
+                    const spotPrice = item.price;
+                    const month = new Date(item.date).toLocaleString('default', { month: 'short' });
+                    
+                    // Calculate standard market price (with standard markup)
+                    const marketMarkup = 0.15;
+                    const marketFixedCost = 5;
+                    const standardPrice = spotPrice * (1 + marketMarkup) + marketFixedCost;
+                    
+                    // Calculate enhanced price based on the selected scenario
+                    let enhancedPrice;
+                    if (hedgingScenario === 'normal') {
+                        // Normal scenario: Standard hedging
+                        enhancedPrice = calculateSMECost(spotPrice);
+                    } else {
+                        // Advanced protection: Enhanced hedging that better handles extreme prices
+                        if (spotPrice > 80) {
+                            // Apply stronger dampening on very high prices
+                            enhancedPrice = Math.min(60, standardPrice * 0.85);
+                        } else if (spotPrice > 50) {
+                            // Apply moderate dampening on high prices
+                            enhancedPrice = Math.min(spotPrice * 0.7 + 15, standardPrice * 0.9);
+                        } else if (spotPrice < 15) {
+                            // Apply floor on very low prices
+                            enhancedPrice = Math.min(32, standardPrice * 0.95);
+                        } else {
+                            // For normal range, use standard calculation
+                            enhancedPrice = calculateSMECost(spotPrice);
+                        }
+                    }
+                    
+                    // Ensure our price is always competitive with market price
+                    enhancedPrice = Math.min(enhancedPrice, standardPrice * 0.98);
+                    
+                    return {
+                        month,
+                        date: item.date,
+                        spotPrice,
+                        standardPrice,
+                        enhancedPrice
+                    };
+                });
+            }
+            
+            // Run simulation with current parameters
+            function runSimulation() {
+                const historicalPrices = activeHistoricalGasPrices.map(item => item.price);
+                const historicalDates = activeHistoricalGasPrices.map(item => item.date);
+                
+                // Generate enhanced strategy data
+                const enhancedStrategyData = generateEnhancedStrategyData(activeHistoricalGasPrices);
+                
+                // Calculate statistics
+                const standardPrices = enhancedStrategyData.map(d => d.standardPrice);
+                const enhancedPrices = enhancedStrategyData.map(d => d.enhancedPrice);
+                
+                const stdDevStandard = calculateStandardDeviation(standardPrices);
+                const stdDevEnhanced = calculateStandardDeviation(enhancedPrices);
+                
+                const maxStandard = Math.max(...standardPrices);
+                const maxEnhanced = Math.max(...enhancedPrices);
+                
+                const volatilityReduction = ((stdDevStandard - stdDevEnhanced) / stdDevStandard * 100);
+                const peakReduction = ((maxStandard - maxEnhanced) / maxStandard * 100);
+                
+                // Calculate volatility
+                const volatility = calculateHistoricalVolatility(historicalPrices);
+                
+                // Initial contract price (first price in historical data)
+                const contractPrice = historicalPrices[0];
+                
+                // Calculate SME costs
+                const smeCosts = historicalPrices.map(price => calculateSMECost(price));
+                
+                // Convert consumption from kWh to MWh
+                const avgConsumptionMWh = params.avgConsumption / 1000;
+                const totalConsumptionMWh = params.numSMEs * avgConsumptionMWh;
+                
+                // Calculate hedging P&L with enhanced implementation
+                const hedgingResult = calculateEnhancedHedgingPnL(
+                    historicalPrices,
+                    contractPrice,
+                    totalConsumptionMWh,
+                    params.timeToMaturity,
+                    params.riskFreeRate,
+                    volatility,
+                    params.hedgingPercentage,
+                    params.annualCarryCost
+                );
+                
+                // Use monthly data from hedging implementation
+                const monthlyData = hedgingResult.monthlyData;
+                const hedgingPnL = hedgingResult.pnlSeries;
+                const hedgingComponents = hedgingResult.pnlComponents;
+                const optionPrices = hedgingResult.optionPrices;
+                
+                // Calculate savings for SMEs including commission
+                const savingsData = calculateCumulativeSavings(
+                    historicalPrices,
+                    avgConsumptionMWh,
+                    params.numSMEs,
+                    params.savingsCommissionPercent
+                );
+                
+                // Extract monthly savings commissions
+                const monthlySavingsCommission = savingsData.map(item => item.monthlyCommission);
+                const totalSavingsCommission = savingsData.length > 0 ? savingsData[savingsData.length - 1].cumulativeCommission : 0;
+                
+                // Calculate business model P&L
+                const businessPnL = [];
+                const premiumRevenueByMonth = [];
+                const commissionRevenueByMonth = [];
+                const monthlyMtMPnL = []; // Separato dal P&L realizzato, solo per visualizzazione
+
+                // Accumulare premi e commissioni mensilmente - questo non cambia
+                for (let i = 1; i < historicalPrices.length; i++) {
+                    const futurePrice = historicalPrices[i];
+                    let smeCost;
+                    
+                    // Apply enhanced pricing in extreme scenario
+                    if (hedgingScenario === 'extreme' && futurePrice > 70) {
+                        smeCost = 60; // Price ceiling
+                    } else if (hedgingScenario === 'extreme' && futurePrice < 20) {
+                        smeCost = 32; // Price floor
+                    } else {
+                        smeCost = calculateSMECost(futurePrice);
+                    }
+                    
+                    const totalEnergyValue = smeCost * totalConsumptionMWh;
+                    const premium = totalEnergyValue * (params.premiumPercentage / 100);
+                    premiumRevenueByMonth.push(premium);
+                    
+                    // Add savings commission (only for months with available data)
+                    const savingsCommission = i <= monthlySavingsCommission.length ? monthlySavingsCommission[i-1] : 0;
+                    commissionRevenueByMonth.push(savingsCommission);
+                    
+                    // Calcolare MtM mensile solo per visualizzazione
+                    const mtmPnL = i > 0 ? hedgingPnL[i-1] : 0;
+                    monthlyMtMPnL.push(mtmPnL);
+                    
+                    // Calcolo PnL mensile (solo per grafici - non rappresenta profitto realizzato)
+                    const monthlyDisplayPnL = premium + mtmPnL + savingsCommission;
+                    businessPnL.push(monthlyDisplayPnL);
+                }
+
+                // Calcolare il P&L cumulativo per visualizzazione nei grafici
+                const cumulativeBusinessPnL = [];
+                let displayTotal = 0;
+                for (const pnl of businessPnL) {
+                    displayTotal += pnl;
+                    cumulativeBusinessPnL.push(displayTotal);
+                }
+
+                // Calcolo del profitto realizzato (quello vero)
+                const totalPremiumRevenue = premiumRevenueByMonth.reduce((sum, val) => sum + val, 0);
+                const totalCommissionRevenue = commissionRevenueByMonth.reduce((sum, val) => sum + val, 0);
+                const totalOperationalRevenue = totalPremiumRevenue + totalCommissionRevenue;
+
+                // Usare il P&L di hedging realizzato (non il mark-to-market)
+                const realHedgingPnL = hedgingResult.realizedHedgingPnL;
+
+                // Calcolo del profitto reale
+                const realBusinessProfit = totalOperationalRevenue + realHedgingPnL;
+
+                // Questa è la variabile da utilizzare per il profitto finale
+                const runningBusinessTotal = realBusinessProfit;
+                
+                // Calculate initial investment (option cost)
+                const initialInvestment = hedgingResult.totalCost;
+                
+                const totalRevenue = premiumRevenueByMonth.reduce((sum, val) => sum + val, 0) + 
+                     commissionRevenueByMonth.reduce((sum, val) => sum + val, 0);
+                // Calculate profit margin
+                const profitMargin = cumulativeBusinessPnL.length > 0 && totalRevenue > 0
+                    ? (cumulativeBusinessPnL[cumulativeBusinessPnL.length - 1] / totalRevenue) * 100
+                    : 0;                   
+                // Prepare data for charts
+                const chartData = historicalDates.slice(1).map((date, i) => {
+                    const mtmIndex = i + 1;
+                    return {
+                        date,
+                        gasPrice: historicalPrices[mtmIndex],
+                        smeCost: smeCosts[mtmIndex],
+                        hedgingMtM: monthlyData[mtmIndex]?.totalMtM || 0,
+                        hedgingPnL: hedgingPnL[i] || 0,
+                        businessPnL: businessPnL[i] || 0,
+                        cumulativeBusinessPnL: cumulativeBusinessPnL[i] || 0,
+                        swapPayoff: hedgingComponents[i]?.swapPayoff || 0,
+                        optionPayoff: hedgingComponents[i]?.optionPayoff || 0,
+                        carryCost: hedgingComponents[i]?.carryPnL || 0,
+                        premiumRevenue: premiumRevenueByMonth[i] || 0,
+                        commissionRevenue: commissionRevenueByMonth[i] || 0
+                    };
                 });
                 
-                // Se il grafico esiste già, distruggilo per evitare duplicati
-                if (savingsChart) {
-                    savingsChart.destroy();
+                // Calculate average monthly premium
+                const avgMonthlyPremium = premiumRevenueByMonth.reduce((sum, premium) => sum + premium, 0) / premiumRevenueByMonth.length;
+                
+                // Calculate total and average savings
+                const totalSavings = savingsData.length > 0 ? savingsData[savingsData.length - 1].cumulativeSaving : 0;
+                const avgSavingsPerSME = totalSavings / params.numSMEs;
+                const avgMonthlySavings = totalSavings / savingsData.length;
+                
+                // Calculate average percentage savings
+                let avgPercentSavings = 0;
+                if (savingsData.length > 0) {
+                    avgPercentSavings = savingsData.reduce((sum, item) => {
+                        return sum + ((item.marketPrice - item.ourPrice) / item.marketPrice) * 100;
+                    }, 0) / savingsData.length;
                 }
                 
-                // Crea il nuovo grafico con due assi Y
-                savingsChart = new Chart(savingsChartCtx, {
-                    type: 'bar',
+                // Calculate total ecosystem values
+                const totalProfit = runningBusinessTotal;
+                const totalClientValue = totalSavings - totalSavingsCommission; // Actual value for clients is savings minus commission
+                const totalEcosystemValue = totalProfit + totalClientValue;
+                
+                // Update dashboard metrics
+                document.getElementById('total-revenue').textContent = formatCurrency(runningBusinessTotal);
+                document.getElementById('monthly-premium').textContent = formatCurrency(avgMonthlyPremium);
+                
+                const profitMarginElement = document.getElementById('profit-margin');
+                profitMarginElement.textContent = formatNumber(profitMargin) + '%';
+                profitMarginElement.className = profitMargin >= 0 ? 'stat-value stat-positive' : 'stat-value stat-negative';
+                
+                document.getElementById('options-cost').textContent = formatCurrency(optionPrices.call + optionPrices.put);
+                document.getElementById('initial-investment').textContent = formatCurrency(initialInvestment);
+                
+                const hedgingPnLElement = document.getElementById('hedging-pnl');
+                const finalHedgingPnL = monthlyData[monthlyData.length - 1]?.totalMtM || 0;
+                hedgingPnLElement.textContent = formatCurrency(finalHedgingPnL);
+                hedgingPnLElement.className = finalHedgingPnL >= 0 ? 'strategy-item-value positive' : 'strategy-item-value negative';
+                
+                // Update enhanced hedging statistics
+                document.getElementById('volatility-reduction').textContent = formatNumber(volatilityReduction) + '%';
+                document.getElementById('peak-reduction').textContent = formatNumber(peakReduction) + '%';
+                document.getElementById('protection-level').textContent = hedgingScenario === 'normal' ? 'Standard' : 'Enhanced';
+                
+                // Update strategy description
+                document.getElementById('strategy-description').textContent = hedgingScenario === 'normal' 
+                    ? 'Base Protection: optimized hedging for normal market conditions' 
+                    : 'Advanced Protection: increased coverage against extreme price shocks';
+                
+                // Update savings metrics
+                document.getElementById('total-savings').textContent = formatCurrency(totalSavings);
+                document.getElementById('avg-savings-per-sme').textContent = formatCurrency(avgSavingsPerSME);
+                document.getElementById('monthly-savings').textContent = formatCurrency(avgMonthlySavings);
+                document.getElementById('percent-savings').textContent = formatNumber(avgPercentSavings) + '%';
+                
+                // Update summary values
+                document.getElementById('total-profit').textContent = formatCurrency(realBusinessProfit);
+                document.getElementById('total-client-value').textContent = formatCurrency(totalClientValue);
+                document.getElementById('savings-commission').textContent = formatCurrency(totalSavingsCommission);
+                document.getElementById('total-ecosystem-value').textContent = formatCurrency(totalEcosystemValue);
+                
+                // Common chart options
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'EUR'
+                                        }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                };
+                
+                // Format dates for charts
+                const formatDate = (dateStr) => {
+                    const date = new Date(dateStr);
+                    return `${date.getMonth()+1}/${date.getFullYear().toString().substr(2, 2)}`;
+                };
+                
+                // Enhanced Hedging Strategy Chart
+                if (hedgingStrategyChart) {
+                    hedgingStrategyChart.destroy();
+                }
+                
+                const strategyCtx = document.getElementById('hedging-strategy-chart').getContext('2d');
+                hedgingStrategyChart = new Chart(strategyCtx, {
+                    type: 'line',
                     data: {
-                        labels: savingsDates,
+                        labels: enhancedStrategyData.map(item => formatDate(item.date)),
                         datasets: [
                             {
-                                label: 'Standard Market Price (€/MWh)',
-                                data: savingsData.map(item => item.marketPrice),
-                                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                                type: 'line',
-                                borderColor: 'rgb(239, 68, 68)',
+                                label: 'Gas spot price',
+                                data: enhancedStrategyData.map(item => item.spotPrice),
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
                                 borderWidth: 2,
-                                fill: false,
-                                tension: 0.1,
-                                yAxisID: 'y'
+                                tension: 0.1
                             },
                             {
-                                label: 'Our Price (€/MWh)',
-                                data: savingsData.map(item => item.ourPrice),
-                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                                type: 'line',
-                                borderColor: 'rgb(16, 185, 129)',
+                                label: 'Standard market price',
+                                data: enhancedStrategyData.map(item => item.standardPrice),
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                 borderWidth: 2,
-                                fill: false,
-                                tension: 0.1,
-                                yAxisID: 'y'
+                                tension: 0.1
                             },
                             {
-                                label: 'Cumulative Savings (€)',
-                                data: savingsData.map(item => item.cumulativeSaving),
-                                backgroundColor: 'rgba(99, 102, 241, 0.7)',
-                                yAxisID: 'y1'
+                                label: 'Price with enhanced strategy',
+                                data: enhancedStrategyData.map(item => item.enhancedPrice),
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.1
                             }
                         ]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        ...chartOptions,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Price (€/MWh)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Revenue Streams Chart
+                if (revenueStreamsChart) {
+                    revenueStreamsChart.destroy();
+                }
+                
+                const revenueStreamsCtx = document.getElementById('revenue-streams-chart').getContext('2d');
+                revenueStreamsChart = new Chart(revenueStreamsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.map(item => formatDate(item.date)),
+                        datasets: [
+                            {
+                                label: 'Premium Revenue',
+                                data: chartData.map(item => item.premiumRevenue),
+                                backgroundColor: '#3B82F6',
+                                stack: 'stack0'
+                            },
+                            {
+                                label: 'Savings Commission',
+                                data: chartData.map(item => item.commissionRevenue),
+                                backgroundColor: '#F59E0B',
+                                stack: 'stack0'
+                            },
+                            {
+                                label: 'Hedging P&L',
+                                data: chartData.map(item => item.hedgingPnL),
+                                backgroundColor: '#10B981',
+                                stack: 'stack0'
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Revenue (€)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Hedging Components Chart
+                if (hedgingComponentsChart) {
+                    hedgingComponentsChart.destroy();
+                }
+                
+                const hedgingComponentsCtx = document.getElementById('hedging-components-chart').getContext('2d');
+                hedgingComponentsChart = new Chart(hedgingComponentsCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.map(item => formatDate(item.date)),
+                        datasets: [
+                            {
+                                label: 'Gas Swap Payoff',
+                                data: chartData.map(item => item.swapPayoff),
+                                backgroundColor: '#3B82F6',
+                                stack: 'stack0'
+                            },
+                            {
+                                label: 'Options Payoff',
+                                data: chartData.map(item => item.optionPayoff),
+                                backgroundColor: '#6366F1',
+                                stack: 'stack0'
+                            },
+                            {
+                                label: 'Carry Cost',
+                                data: chartData.map(item => item.carryCost),
+                                backgroundColor: '#EF4444',
+                                stack: 'stack0'
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Payoff (€)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Cumulative Performance Chart
+                if (cumulativePerformanceChart) {
+                    cumulativePerformanceChart.destroy();
+                }
+                
+                const cumulativePerformanceCtx = document.getElementById('cumulative-performance-chart').getContext('2d');
+                cumulativePerformanceChart = new Chart(cumulativePerformanceCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.map(item => formatDate(item.date)),
+                        datasets: [
+                            {
+                                label: 'Cumulative Business P&L',
+                                data: chartData.map(item => item.cumulativeBusinessPnL),
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                fill: true,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Hedging Mark-to-Market',
+                                data: chartData.map(item => item.hedgingMtM),
+                                borderColor: '#6366F1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                fill: true,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Cumulative P&L (€)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Monthly P&L Chart
+                if (monthlyPnLChart) {
+                    monthlyPnLChart.destroy();
+                }
+                
+                const monthlyPnLCtx = document.getElementById('monthly-pnl-chart').getContext('2d');
+                monthlyPnLChart = new Chart(monthlyPnLCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.map(item => formatDate(item.date)),
+                        datasets: [
+                            {
+                                label: 'Monthly Business P&L',
+                                data: chartData.map(item => item.businessPnL),
+                                backgroundColor: function(context) {
+                                    const value = context.dataset.data[context.dataIndex];
+                                    return value >= 0 ? '#3B82F6' : '#EF4444';
+                                }
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Monthly P&L (€)'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Savings Chart
+                if (savingsChart) {
+                    savingsChart.destroy();
+                }
+                
+                const savingsChartCtx = document.getElementById('savings-chart').getContext('2d');
+                savingsChart = new Chart(savingsChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: savingsData.map(item => formatDate(item.date.toISOString().split('T')[0])),
+                        datasets: [
+                            {
+                                label: 'Standard Market Price (€/MWh)',
+                                data: savingsData.map(item => item.marketPrice),
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 2,
+                                yAxisID: 'y',
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Our Price (€/MWh)',
+                                data: savingsData.map(item => item.ourPrice),
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                yAxisID: 'y',
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Cumulative Savings (€)',
+                                data: savingsData.map(item => item.cumulativeSaving),
+                                borderColor: '#6366F1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                yAxisID: 'y1',
+                                tension: 0.1,
+                                type: 'line'
+                            }
+                        ]
+                    },
+                    options: {
+                        ...chartOptions,
                         scales: {
                             y: {
                                 type: 'linear',
@@ -971,26 +1940,24 @@
                     }
                 });
             }
-        }
-        
-        // Configura i listener di eventi per i selettori e gli slider
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestisci il selettore di anno
-            const yearButtons = document.querySelectorAll('#year-selector .year-btn');
-            yearButtons.forEach(button => {
+            
+            // Add event listeners to UI controls
+            // Year selector buttons
+            const periodButtons = document.querySelectorAll('#period-selector .period-btn');
+            periodButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // Rimuovi la classe attiva da tutti i bottoni
-                    yearButtons.forEach(btn => btn.classList.remove('active'));
+                    // Remove active class from all buttons
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
                     
-                    // Aggiungi la classe attiva al bottone cliccato
+                    // Add active class to clicked button
                     this.classList.add('active');
                     
-                    // Imposta il periodo attivo
+                    // Set active period
                     activePeriod = this.getAttribute('data-year');
                     activeHistoricalGasPrices = dataByYear[activePeriod];
                     
-                    // Aggiorna l'etichetta del periodo
-                    const periodLabel = document.getElementById('current-period');
+                    // Update period badge
+                    const periodBadge = document.getElementById('current-period-badge');
                     let periodText = '';
                     
                     switch(activePeriod) {
@@ -1004,14 +1971,29 @@
                             periodText = activePeriod;
                     }
                     
-                    periodLabel.textContent = 'Current period: ' + periodText;
+                    periodBadge.textContent = periodText;
                     
-                    // Esegui la simulazione con i nuovi dati
+                    // Run simulation with new data
                     runSimulation();
                 });
             });
             
-            // Configura i listener per gli slider
+            // Hedging scenario radio buttons
+            document.getElementById('normal-scenario').addEventListener('change', function() {
+                if (this.checked) {
+                    hedgingScenario = 'normal';
+                    runSimulation();
+                }
+            });
+            
+            document.getElementById('extreme-scenario').addEventListener('change', function() {
+                if (this.checked) {
+                    hedgingScenario = 'extreme';
+                    runSimulation();
+                }
+            });
+            
+            // Parameter sliders
             document.getElementById('numSMEs').addEventListener('input', function(e) {
                 params.numSMEs = Number(e.target.value);
                 document.getElementById('numSMEs-value').textContent = formatNumber(params.numSMEs);
@@ -1026,25 +2008,32 @@
             
             document.getElementById('premiumPercentage').addEventListener('input', function(e) {
                 params.premiumPercentage = Number(e.target.value);
-                document.getElementById('premiumPercentage-value').textContent = formatNumber(params.premiumPercentage);
+                document.getElementById('premiumPercentage-value').textContent = formatNumber(params.premiumPercentage) + '%';
                 runSimulation();
             });
             
             document.getElementById('hedgingPercentage').addEventListener('input', function(e) {
                 params.hedgingPercentage = Number(e.target.value);
-                document.getElementById('hedgingPercentage-value').textContent = formatNumber(params.hedgingPercentage);
+                document.getElementById('hedgingPercentage-value').textContent = formatNumber(params.hedgingPercentage) + '%';
                 runSimulation();
             });
             
             document.getElementById('annualCarryCost').addEventListener('input', function(e) {
                 params.annualCarryCost = Number(e.target.value) / 100;
-                document.getElementById('annualCarryCost-value').textContent = formatNumber(Number(e.target.value));
+                document.getElementById('annualCarryCost-value').textContent = formatNumber(Number(e.target.value)) + '%';
                 runSimulation();
             });
             
-            // Esegui la simulazione al caricamento della pagina
+            document.getElementById('savingsCommissionPercent').addEventListener('input', function(e) {
+                params.savingsCommissionPercent = Number(e.target.value);
+                document.getElementById('savingsCommissionPercent-value').textContent = formatNumber(params.savingsCommissionPercent) + '%';
+                runSimulation();
+            });
+            
+            // Run initial simulation
             runSimulation();
         });
     </script>
+                
 </body>
 </html>
